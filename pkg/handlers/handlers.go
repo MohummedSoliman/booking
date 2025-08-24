@@ -44,6 +44,10 @@ func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, "contact.page.html")
 }
 
-func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) SearchAvailability(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, "reservation.page.html")
+}
+
+func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "make-reservation.page.html")
 }
