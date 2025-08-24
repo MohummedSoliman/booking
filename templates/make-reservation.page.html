@@ -67,47 +67,64 @@
     </nav>
     <div class="container">
         <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-6">
-                <h1 class="text-center mt-5">Search For Availability</h1>
-                <form action="/make-reservation" method="get">
-                    <div class="row">
-                        <div class="col mb-3">
-                            <label for="start_date" class="form-label"
-                                >Starting Date</label
-                            >
-                            <input
-                                required
-                                type="date"
-                                class="form-control"
-                                id="start_date"
-                                name="start_date"
-                                aria-describedby="startDateHelp"
-                            />
-                            <div id="emailHelp" class="form-text">
-                                Enter your starting date.
-                            </div>
-                        </div>
-                        <div class="col mb-3">
-                            <label for="end_date" class="form-label"
-                                >Ending Date</label
-                            >
-                            <input
-                                required
-                                type="date"
-                                class="form-control"
-                                id="end_date"
-                                name="end_date"
-                                aria-describedby="endDateHelp"
-                            />
-                            <div id="emailHelp" class="form-text">
-                                Enter your ending date.
-                            </div>
-                        </div>
+            <div class="col">
+                <h1>Make Reservation</h1>
+                <form
+                    action=""
+                    method="post"
+                    class="needs-validation"
+                    novalidate
+                >
+                    <div class="form-group mt-5">
+                        <label for="first-name">First Name :</label>
+                        <input
+                            type="text"
+                            name="first_name"
+                            id="first_name"
+                            class="form-control"
+                            required
+                            autocomplete="off"
+                        />
                     </div>
-                    <button type="submit" class="btn btn-primary">
-                        Search Availability
-                    </button>
+                    <div class="form-group">
+                        <label for="last-name">Last Name :</label>
+                        <input
+                            type="text"
+                            name="last_name"
+                            id="last_name"
+                            class="form-control"
+                            required
+                            autocomplete="off"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email :</label>
+                        <input
+                            type="email"
+                            name="email"
+                            id="email"
+                            class="form-control"
+                            required
+                            autocomplete="off"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number:</label>
+                        <input
+                            type="text"
+                            name="phone"
+                            id="phone"
+                            class="form-control"
+                            required
+                            autocomplete="off"
+                        />
+                    </div>
+                    <hr />
+                    <input
+                        type="submit"
+                        class="btn btn-primary"
+                        value="Make Reservation"
+                    />
                 </form>
             </div>
         </div>
