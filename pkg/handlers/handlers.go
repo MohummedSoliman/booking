@@ -2,6 +2,8 @@
 package handlers
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/MohummedSoliman/booking/pkg/config"
@@ -13,6 +15,11 @@ var Repo *Repository
 
 type Repository struct {
 	App *config.AppConfig
+}
+
+type jsonResponse struct {
+	Ok      bool   `json:"ok"`
+	Message string `json:"message"`
 }
 
 func NewRepository(a *config.AppConfig) *Repository {
@@ -50,8 +57,26 @@ func (m *Repository) SearchAvailability(w http.ResponseWriter, r *http.Request) 
 }
 
 func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
+	start := r.Form.Get("start")
+	end := r.Form.Get("end")
+	log.Println(start, end)
+
 	w.Write([]byte("Posted from page"))
 	// render.RenderTemplate(w, "search-availability.page.html")
+}
+
+func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
+	resp := jsonResponse{
+		Ok:      true,
+		Message: "Available",
+	}
+
+	out, err := json.MarshalIndent(resp, "", "\t")
+	if err != nil {
+		log.Println(err)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(out)
 }
 
 func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
