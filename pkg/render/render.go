@@ -9,6 +9,8 @@ import (
 	"text/template"
 
 	"github.com/MohummedSoliman/booking/pkg/config"
+	"github.com/MohummedSoliman/booking/pkg/models"
+	"github.com/justinas/nosurf"
 )
 
 var app *config.AppConfig
@@ -17,7 +19,12 @@ func NewTemplate(a *config.AppConfig) {
 	app = a
 }
 
-func RenderTemplate(w http.ResponseWriter, temName string) {
+func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
+	td.CSRFToken = nosurf.Token(r)
+	return td
+}
+
+func RenderTemplate(w http.ResponseWriter, r *http.Request, td *models.TemplateData, temName string) {
 	var tc map[string]*template.Template
 	if app.UseCache {
 		tc = app.TemplateCache
@@ -31,7 +38,8 @@ func RenderTemplate(w http.ResponseWriter, temName string) {
 	}
 
 	buf := new(bytes.Buffer)
-	err := t.Execute(buf, nil)
+	td = AddDefaultData(td, r)
+	err := t.Execute(buf, td)
 	if err != nil {
 		log.Println(err)
 	}
