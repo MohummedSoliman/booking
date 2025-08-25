@@ -11,6 +11,11 @@
                     novalidate
                     class="needs-validation"
                 >
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{.CSRFToken}}"
+                    />
                     <div class="row" id="reservations-date">
                         <div class="col">
                             <input
