@@ -10,6 +10,11 @@
                     class="needs-validation"
                     novalidate
                 >
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{.CSRFToken}}"
+                    />
                     <div class="form-group mt-5">
                         <label for="first-name">First Name :</label>
                         <input
