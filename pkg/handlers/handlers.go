@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/MohummedSoliman/booking/pkg/config"
+	"github.com/MohummedSoliman/booking/pkg/models"
 	"github.com/MohummedSoliman/booking/pkg/render"
 )
 
@@ -25,27 +26,27 @@ func NewHandlers(r *Repository) {
 }
 
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "home.page.html")
+	render.RenderTemplate(w, r, &models.TemplateData{}, "home.page.html")
 }
 
 func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "about.page.html")
+	render.RenderTemplate(w, r, &models.TemplateData{}, "about.page.html")
 }
 
 func (m *Repository) Generals(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "generals.page.html")
+	render.RenderTemplate(w, r, &models.TemplateData{}, "generals.page.html")
 }
 
 func (m *Repository) Majors(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "majors.page.html")
+	render.RenderTemplate(w, r, &models.TemplateData{}, "majors.page.html")
 }
 
 func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "contact.page.html")
+	render.RenderTemplate(w, r, &models.TemplateData{}, "contact.page.html")
 }
 
 func (m *Repository) SearchAvailability(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "search-availability.page.html")
+	render.RenderTemplate(w, r, &models.TemplateData{}, "search-availability.page.html")
 }
 
 func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
@@ -54,5 +55,5 @@ func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "make-reservation.page.html")
+	render.RenderTemplate(w, r, &models.TemplateData{}, "make-reservation.page.html")
 }
