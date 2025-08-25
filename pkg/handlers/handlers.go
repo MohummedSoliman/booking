@@ -48,6 +48,11 @@ func (m *Repository) SearchAvailability(w http.ResponseWriter, r *http.Request) 
 	render.RenderTemplate(w, "search-availability.page.html")
 }
 
+func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Posted from page"))
+	// render.RenderTemplate(w, "search-availability.page.html")
+}
+
 func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, "make-reservation.page.html")
 }
