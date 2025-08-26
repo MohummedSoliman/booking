@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/MohummedSoliman/booking/pkg/config"
+	"github.com/MohummedSoliman/booking/pkg/forms"
 	"github.com/MohummedSoliman/booking/pkg/models"
 	"github.com/MohummedSoliman/booking/pkg/render"
 )
@@ -80,5 +81,37 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, r, &models.TemplateData{}, "make-reservation.page.html")
+	render.RenderTemplate(w, r, &models.TemplateData{
+		Form: forms.New(nil),
+	}, "make-reservation.page.html")
+}
+
+func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	reservation := models.Reservation{
+		FirstName: r.Form.Get("first_name"),
+		LastName:  r.Form.Get("last_name"),
+		Email:     r.Form.Get("email"),
+		Phone:     r.Form.Get("phone"),
+	}
+
+	form := forms.New(r.PostForm)
+
+	form.Has("first_name", r)
+
+	if !form.Valid() {
+		data := make(map[string]any)
+		data["reservation"] = reservation
+
+		render.RenderTemplate(w, r, &models.TemplateData{
+			Form: form,
+			Data: data,
+		}, "make-reservation.page.html")
+		return
+	}
 }
