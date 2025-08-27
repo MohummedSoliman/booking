@@ -3,6 +3,8 @@ package render
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -13,7 +15,10 @@ import (
 	"github.com/justinas/nosurf"
 )
 
-var app *config.AppConfig
+var (
+	app          *config.AppConfig
+	pathTemplate = "./templates"
+)
 
 func NewTemplate(a *config.AppConfig) {
 	app = a
@@ -27,7 +32,7 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 	return td
 }
 
-func RenderTemplate(w http.ResponseWriter, r *http.Request, td *models.TemplateData, temName string) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, td *models.TemplateData, temName string) error {
 	var tc map[string]*template.Template
 	if app.UseCache {
 		tc = app.TemplateCache
@@ -37,7 +42,7 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, td *models.TemplateD
 
 	t, ok := tc[temName]
 	if !ok {
-		log.Fatal("Could not get tempate from templates cache")
+		return errors.New("can not get templates from cache")
 	}
 
 	buf := new(bytes.Buffer)
@@ -50,13 +55,15 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, td *models.TemplateD
 	_, err = buf.WriteTo(w)
 	if err != nil {
 		log.Println(err)
+		return err
 	}
+	return nil
 }
 
 func CreateTemplateCache() (map[string]*template.Template, error) {
 	myCache := map[string]*template.Template{}
 
-	pages, err := filepath.Glob("./templates/*.page.*")
+	pages, err := filepath.Glob(fmt.Sprintf("%s/*.page.*", pathTemplate))
 	if err != nil {
 		log.Println(err)
 		return myCache, err
@@ -68,13 +75,13 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 		if err != nil {
 			return myCache, err
 		}
-		matches, err := filepath.Glob("./templates/*.layout.*")
+		matches, err := filepath.Glob(fmt.Sprintf("%s/*.layout.*", pathTemplate))
 		if err != nil {
 			return myCache, err
 		}
 
 		if len(matches) > 0 {
-			t, err = t.ParseGlob("./templates/*.layout.*")
+			t, err = t.ParseGlob(fmt.Sprintf("%s/*.layout.*", pathTemplate))
 			if err != nil {
 				return myCache, err
 			}
