@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/MohummedSoliman/booking/driver"
 	"github.com/MohummedSoliman/booking/pkg/config"
 	"github.com/MohummedSoliman/booking/pkg/handlers"
 	"github.com/MohummedSoliman/booking/pkg/helpers"
@@ -26,11 +27,13 @@ var (
 )
 
 func main() {
-	err := run()
+	db, err := run()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+
+	defer db.SQL.Close()
 
 	fmt.Printf("The Application run on Port : %s", portNumber)
 
@@ -45,9 +48,12 @@ func main() {
 	}
 }
 
-func run() error {
+func run() (*driver.DB, error) {
 	// What i'm going to put in the session.
 	gob.Register(models.Reservation{})
+	gob.Register(models.Room{})
+	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
 
 	app.InProduction = false
 
@@ -65,18 +71,25 @@ func run() error {
 
 	app.Session = session
 
+	// connect to DB.
+	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=bookings user=postgres password=postgres")
+	if err != nil {
+		log.Fatal("Can not connect to DB")
+	}
+
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatal("Can not load template cache")
+		return nil, err
 	}
 
 	app.TemplateCache = tc
 	app.UseCache = false
 
-	repo := handlers.NewRepository(&app)
+	repo := handlers.NewRepository(&app, db)
 	handlers.NewHandlers(repo)
 
 	render.NewTemplate(&app)
 	helpers.NewHelpers(&app)
-	return nil
+	return db, nil
 }
