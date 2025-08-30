@@ -1,0 +1,9 @@
+add_foreign_key("room_restrictions", "room_id", {"rooms": ["id"]}, {
+    "on_delete": "CASCADE",
+    "on_update": "CASCADE",
+})
+
+add_foreign_key("room_restrictions", "restriction_id", {"restrictions": ["id"]}, {
+    "on_delete": "CASCADE",
+    "on_update": "CASCADE",
+})
