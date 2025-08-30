@@ -5,18 +5,24 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 
+	"github.com/MohummedSoliman/booking/driver"
 	"github.com/MohummedSoliman/booking/pkg/config"
 	"github.com/MohummedSoliman/booking/pkg/forms"
 	"github.com/MohummedSoliman/booking/pkg/helpers"
 	"github.com/MohummedSoliman/booking/pkg/models"
 	"github.com/MohummedSoliman/booking/pkg/render"
+	"github.com/MohummedSoliman/booking/repository"
+	dbrepo "github.com/MohummedSoliman/booking/repository/dbRepo"
 )
 
 var Repo *Repository
 
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 type jsonResponse struct {
@@ -24,9 +30,10 @@ type jsonResponse struct {
 	Message string `json:"message"`
 }
 
-func NewRepository(a *config.AppConfig) *Repository {
+func NewRepository(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 
@@ -100,11 +107,37 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sd := r.Form.Get("start_date")
+	ed := r.Form.Get("end_date")
+
+	// example for date want to cenvert the string to it.
+	layout := "2006-01-02"
+
+	startDate, err := time.Parse(layout, sd)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	endDate, err := time.Parse(layout, ed)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	roomId, err := strconv.Atoi(r.Form.Get("room_id"))
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
 	reservation := models.Reservation{
 		FirstName: r.Form.Get("first_name"),
 		LastName:  r.Form.Get("last_name"),
 		Email:     r.Form.Get("email"),
 		Phone:     r.Form.Get("phone"),
+		StartDate: startDate,
+		EndDate:   endDate,
+		RoomID:    roomId,
 	}
 
 	form := forms.New(r.PostForm)
@@ -121,6 +154,26 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 			Form: form,
 			Data: data,
 		}, "make-reservation.page.html")
+		return
+	}
+
+	resID, err := m.DB.InsertReservation(reservation)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	restirction := models.RoomRestriction{
+		ReservationID: resID,
+		StartDate:     startDate,
+		EndDate:       endDate,
+		RoomID:        roomId,
+		RestrictionID: 1,
+	}
+
+	err = m.DB.InsertRoomRestriction(restirction)
+	if err != nil {
+		helpers.ServerError(w, err)
 		return
 	}
 
