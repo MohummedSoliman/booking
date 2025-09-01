@@ -41,6 +41,13 @@ func NewRepository(a *config.AppConfig, db *driver.DB) *Repository {
 	}
 }
 
+func NewTestingRepo(a *config.AppConfig) *Repository {
+	return &Repository{
+		App: a,
+		DB:  dbrepo.NewTestingRepo(a),
+	}
+}
+
 func NewHandlers(r *Repository) {
 	Repo = r
 }
@@ -116,7 +123,15 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 
 	layout := "2006-01-02"
 	startDate, err := time.Parse(layout, sd)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
 	endDate, err := time.Parse(layout, ed)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
 
 	roomID, _ := strconv.Atoi(r.Form.Get("room_id"))
 
@@ -141,7 +156,7 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
 	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		helpers.ServerError(w, errors.New("Can not get reservation from session"))
+		helpers.ServerError(w, errors.New("can not get reservation from session"))
 		return
 	}
 
@@ -174,7 +189,7 @@ func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
 func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		helpers.ServerError(w, errors.New("Can not get reservation from session"))
+		helpers.ServerError(w, errors.New("can not get reservation from session"))
 		return
 	}
 
@@ -267,7 +282,7 @@ func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
 
 	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		helpers.ServerError(w, errors.New("Some thing went error"))
+		helpers.ServerError(w, errors.New("some thing went error"))
 		return
 	}
 
