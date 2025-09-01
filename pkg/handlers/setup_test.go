@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"testing"
 	"text/template"
 	"time"
 
@@ -24,7 +25,7 @@ var (
 	pathTemplate = "./../../templates"
 )
 
-func getRoutes() http.Handler {
+func TestMain(m *testing.M) {
 	// What i'm going to put in the session.
 	gob.Register(models.Reservation{})
 
@@ -57,9 +58,12 @@ func getRoutes() http.Handler {
 
 	render.NewTemplate(&app)
 
-	mux := chi.NewRouter()
+	os.Exit(m.Run())
+}
 
+func getRoutes() http.Handler {
 	// mux.Use(NoSurf)
+	mux := chi.NewRouter()
 	mux.Use(SessionLoad)
 
 	mux.Get("/", Repo.Home)
