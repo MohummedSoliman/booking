@@ -139,9 +139,6 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 	layout := "2006-01-02"
 	startDate, err := time.Parse(layout, sd)
 	if err != nil {
-		log.Println(sd)
-		log.Println("////////////////////////")
-		log.Println(err)
 		helpers.ServerError(w, err)
 		return
 	}
@@ -398,4 +395,47 @@ func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 	m.App.Session.Put(r.Context(), "reservation", res)
 
 	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
+}
+
+func (m *Repository) ShowLogin(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, r, &models.TemplateData{
+		Form: forms.New(nil),
+	}, "login.page.html")
+}
+
+// PostLogin handle logging the user in
+func (m *Repository) PostLogin(w http.ResponseWriter, r *http.Request) {
+	_ = m.App.Session.RenewToken(r.Context())
+
+	err := r.ParseForm()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("email", "password")
+	form.IsEmail("email")
+
+	if !form.Valid() {
+		render.RenderTemplate(w, r, &models.TemplateData{
+			Form: form,
+		}, "login.page.html")
+		return
+	}
+
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
+
+	id, _, err := m.DB.Authenticate(email, password)
+	if err != nil {
+		log.Println(err)
+		m.App.Session.Put(r.Context(), "error", "Invalid Login Credentials")
+		http.Redirect(w, r, "/user", http.StatusSeeOther)
+		return
+	}
+
+	m.App.Session.Put(r.Context(), "user_id", id)
+	m.App.Session.Put(r.Context(), "flash", "Logged in successfully")
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
