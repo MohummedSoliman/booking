@@ -451,8 +451,20 @@ func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, r, &models.TemplateData{}, "admin-dashboard.page.html")
 }
 
+// AdminNewReservations show all new reservations.
 func (m *Repository) AdminNewReservations(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, r, &models.TemplateData{}, "admin-new-reservations.page.html")
+	reservations, err := m.DB.AllNewReservations()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	data := make(map[string]any)
+	data["reservations"] = reservations
+
+	render.RenderTemplate(w, r, &models.TemplateData{
+		Data: data,
+	}, "admin-new-reservations.page.html")
 }
 
 func (m *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Request) {
