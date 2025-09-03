@@ -207,7 +207,42 @@ func (m *postgresDBRepo) GetAllReservations() ([]models.Reservation, error) {
 	}
 
 	if err = rows.Err(); err != nil {
-		return reservations, nil
+		return reservations, err
 	}
+	return reservations, nil
+}
+
+func (m *postgresDBRepo) AllNewReservations() ([]models.Reservation, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var reservations []models.Reservation
+
+	query := `SELECT r.id, r.first_name, r.last_name, r.email, r.phone, r.start_date, r.end_date,
+			  r.room_id, r.created_at, r.updated_at, rm.id,  rm.room_name
+			  FROM reservations r JOIN rooms rm
+			  ON r.room_id = rm.id
+			  WHERE r.processed = 0 ORDER BY r.start_date asc`
+
+	rows, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return reservations, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var res models.Reservation
+		err := rows.Scan(&res.ID, &res.FirstName, &res.LastName, &res.Email, &res.Phone, &res.StartDate,
+			&res.EndDate, &res.RoomID, &res.CreatedAt, &res.UpdatedAt, &res.Room.ID, &res.Room.RoomName)
+		if err != nil {
+			return reservations, err
+		}
+		reservations = append(reservations, res)
+	}
+
+	if err = rows.Err(); err != nil {
+		return reservations, err
+	}
+
 	return reservations, nil
 }
