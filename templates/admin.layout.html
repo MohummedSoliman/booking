@@ -18,6 +18,11 @@
             rel="stylesheet"
             href="/static/admin/vendors/base/vendor.bundle.base.css"
         />
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://unpkg.com/notie/dist/notie.min.css"
+        />
         <!-- endinject -->
         <!-- plugin css for this page -->
         <!-- End plugin css for this page -->
@@ -166,10 +171,46 @@
         <script src="/static/admin/js/hoverable-collapse.js"></script>
         <script src="/static/admin/js/template.js"></script>
         <script src="/static/admin/js/todolist.js"></script>
+        <!-- This notic altering package js script -->
+        <script src="https://unpkg.com/notie"></script>
+        <!-- SweetAlert -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="./../static/js/app.js"></script>
         <!-- endinject -->
         <!-- Custom js for this page-->
         <script src="/static/admin/js/dashboard.js"></script>
         <!-- End custom js for this page-->
+        <script>
+            let attention = Prompt();
+
+            function notify(msgType, msg) {
+                notie.alert({
+                    type: msgType,
+                    text: msg,
+                });
+            }
+
+            function notifyModel(title, text, icon, confirmationBtn) {
+                Swal.fire({
+                    title: title,
+                    html: text,
+                    icon: icon,
+                    confirmButtonText: confirmationBtn,
+                });
+            }
+
+            {{with .Error}}
+            notify("error", "{{.}}");
+            {{end}}
+
+            {{with .Flash}}
+            notify("success", "{{.}}");
+            {{end}}
+
+            {{with .Warning}}
+            notify("warning", "{{.}}");
+            {{end}}
+        </script>
 
         {{block "js" . }} {{end}}
     </body>
