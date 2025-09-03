@@ -446,3 +446,30 @@ func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
 	m.App.Session.RenewToken(r.Context())
 	http.Redirect(w, r, "/user", http.StatusSeeOther)
 }
+
+func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, r, &models.TemplateData{}, "admin-dashboard.page.html")
+}
+
+func (m *Repository) AdminNewReservations(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, r, &models.TemplateData{}, "admin-new-reservations.page.html")
+}
+
+func (m *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Request) {
+	reservations, err := m.DB.GetAllReservations()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	data := make(map[string]any)
+	data["reservations"] = reservations
+
+	render.RenderTemplate(w, r, &models.TemplateData{
+		Data: data,
+	}, "admin-all-reservations.page.html")
+}
+
+func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, r, &models.TemplateData{}, "admin-reservations-calendar.page.html")
+}
