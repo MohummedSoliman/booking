@@ -22,7 +22,8 @@ var (
 )
 
 var functions = template.FuncMap{
-	"humanDate": HumanDate,
+	"humanDate":  HumanDate,
+	"formatDate": FormatDate,
 }
 
 func NewTemplate(a *config.AppConfig) {
@@ -32,6 +33,10 @@ func NewTemplate(a *config.AppConfig) {
 // HumanDate return time in yyyy-mm-dd format
 func HumanDate(t time.Time) string {
 	return t.Format("2006-01-02")
+}
+
+func FormatDate(t time.Time, format string) string {
+	return t.Format(format)
 }
 
 func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
