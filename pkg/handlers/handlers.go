@@ -566,3 +566,21 @@ func (m *Repository) AdminPrcoessReservation(w http.ResponseWriter, r *http.Requ
 	m.App.Session.Put(r.Context(), "flash", "Reservation Marked as Processed")
 	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
 }
+
+func (m *Repository) DeleteReservationByID(w http.ResponseWriter, r *http.Request) {
+	src := chi.URLParam(r, "source")
+	resID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	err = m.DB.DeleteReservationByID(resID)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	m.App.Session.Put(r.Context(), "flash", "Reservation Deleted Successfully")
+	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+}
