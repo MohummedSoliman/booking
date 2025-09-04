@@ -24,6 +24,7 @@ var (
 var functions = template.FuncMap{
 	"humanDate":  HumanDate,
 	"formatDate": FormatDate,
+	"iterate":    Iterate,
 }
 
 func NewTemplate(a *config.AppConfig) {
@@ -37,6 +38,15 @@ func HumanDate(t time.Time) string {
 
 func FormatDate(t time.Time, format string) string {
 	return t.Format(format)
+}
+
+func Iterate(count int) []int {
+	var items []int
+
+	for i := 1; i < count+1; i++ {
+		items = append(items, i)
+	}
+	return items
 }
 
 func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
