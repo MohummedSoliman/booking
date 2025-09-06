@@ -25,9 +25,19 @@ var (
 	pathTemplate = "./../../templates"
 )
 
+var functions = template.FuncMap{
+	"humanDate":  render.HumanDate,
+	"formatDate": render.FormatDate,
+	"iterate":    render.Iterate,
+}
+
 func TestMain(m *testing.M) {
 	// What i'm going to put in the session.
 	gob.Register(models.Reservation{})
+	gob.Register(models.Room{})
+	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(map[string]int{})
 
 	app.InProduction = false
 
@@ -53,6 +63,7 @@ func TestMain(m *testing.M) {
 
 	tc, err := CreateTestTemplateCache()
 	if err != nil {
+		log.Println(err)
 		log.Fatal("Can not load template cache")
 	}
 
@@ -128,7 +139,7 @@ func CreateTestTemplateCache() (map[string]*template.Template, error) {
 
 	for _, page := range pages {
 		name := filepath.Base(page)
-		t, err := template.New(name).ParseFiles(page)
+		t, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
 			return myCache, err
 		}
