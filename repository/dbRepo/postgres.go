@@ -340,3 +340,41 @@ func (m *postgresDBRepo) AllRooms() ([]models.Room, error) {
 
 	return rooms, nil
 }
+
+func (m *postgresDBRepo) GetRestrictionsForRoomsByDate(roomID int, start, end time.Time) ([]models.RoomRestriction, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var restrictions []models.RoomRestriction
+
+	query := `SELECT id, COALESCE(reservation_id, 0), restriction_id, room_id, start_date, end_date
+			  FROM room_restrictions WHERE $1 < end_date and $2 >= start_date and room_id = $3`
+
+	rows, err := m.DB.QueryContext(ctx, query, start, end, roomID)
+	if err != nil {
+		return restrictions, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var restriction models.RoomRestriction
+		err := rows.Scan(
+			&restriction.ID,
+			&restriction.ReservationID,
+			&restriction.RestrictionID,
+			&restriction.RoomID,
+			&restriction.StartDate,
+			&restriction.EndDate,
+		)
+		if err != nil {
+			return restrictions, err
+		}
+		restrictions = append(restrictions, restriction)
+	}
+
+	if err = rows.Err(); err != nil {
+		return restrictions, err
+	}
+
+	return restrictions, nil
+}
