@@ -22,6 +22,10 @@
         >
     </div>
 
+    <form action="/admin/reservations-calendar" method="post">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        <input type="hidden" name="mon" value="{{index .StringMap "currMonth"}}">
+        <input type="hidden" name="year" value="{{index .StringMap "currMonthYear"}}">
     {{range $rooms}} {{$roomId := .ID}} {{$blocks := index $.Data (printf
     "block_map_%d" .ID)}} {{$reservations := index $.Data (printf
     "reservation_map_%d" .ID)}}
@@ -46,6 +50,7 @@
                         value="{{index $blocks (printf "%s-%s-%d" $currYear $currMonth .)}}"
                         {{else}}
                         name="add_block_{{$roomId}}_{{printf "%s-%s-%d" $currYear $currMonth .}}"
+                        value="1"
                         {{end}}
                         type="checkbox" />
                     {{end}}
@@ -55,5 +60,8 @@
         </table>
     </div>
     {{end}}
+    <hr>
+    <input type="submit" class="btn btn-primary" value="Save Changes">
+    </form>
 </div>
 {{end}}
